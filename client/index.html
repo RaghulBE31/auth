@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aurum Auth</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #0f1a3d, #2c3e50);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 500px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+    }
+    .auth-header { text-align: center; margin-bottom: 30px; }
+    .auth-header h2 { color: #333; font-size: 2rem; margin-bottom: 10px; }
+    .auth-header p { color: #777; font-size: 1rem; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #444;
+    }
+    .input-with-icon { position: relative; }
+    .input-with-icon i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #777;
+    }
+    .input-with-icon input {
+      width: 100%;
+      padding: 15px 15px 15px 45px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    .input-with-icon input:focus {
+      border-color: #D4AF37;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+    }
+    .password-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 20px 0;
+    }
+    .checkbox-group { display: flex; align-items: center; }
+    .checkbox-group input { margin-right: 8px; accent-color: #D4AF37; }
+    .forgot-password {
+      color: #D4AF37;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+    .forgot-password:hover { color: #B8860B; text-decoration: underline; }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .btn-primary {
+      background: linear-gradient(to right, #D4AF37, #B8860B);
+      color: white;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(to right, #C5A227, #A67C00);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(212, 175, 55, 0.4);
+    }
+    .btn-secondary {
+      background: #f5f5f5;
+      color: #555;
+      border: 1px solid #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-secondary:hover { background: #e9e9e9; }
+    .btn-secondary i { margin-right: 10px; color: #4285F4; }
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 25px 0;
+      color: #777;
+    }
+    .divider::before, .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #ddd;
+    }
+    .divider span { padding: 0 15px; font-size: 0.9rem; }
+    .auth-footer {
+      text-align: center;
+      margin-top: 20px;
+      color: #777;
+    }
+    .auth-footer a {
+      color: #D4AF37;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+    .auth-footer a:hover { color: #B8860B; text-decoration: underline; }
+    .password-toggle {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #777;
+    }
+    .password-strength {
+      height: 5px;
+      width: 100%;
+      background: #eee;
+      border-radius: 3px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .strength-meter {
+      height: 100%;
+      width: 0;
+      background: #ccc;
+      transition: width 0.3s, background 0.3s;
+    }
+    #signup-form { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="auth-section">
+      <!-- Sign In Form -->
+      <form id="signin-form">
+        <div class="auth-header">
+          <h2>Sign In</h2>
+          <p>Welcome back! Please login to your account.</p>
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <div class="input-with-icon">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="email" placeholder="name@company.com" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-with-icon">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" placeholder="Enter your password" required>
+            <span class="password-toggle" id="password-toggle"><i class="fas fa-eye"></i></span>
+          </div>
+        </div>
+        <div class="password-options">
+          <div class="checkbox-group">
+            <input type="checkbox" id="keyed-password">
+            <label for="keyed-password">Keyed password?</label>
+          </div>
+          <a href="/forgot-password.html" class="forgot-password">Forgot Password?</a>
+        </div>
+        <button type="submit" class="btn btn-primary">Sign In</button>
+        <div class="divider"><span>Or continue with</span></div>
+        <a href="http://localhost:5000/api/auth/google" class="btn btn-secondary">
+          <i class="fab fa-google"></i> Google
+        </a>
+      </form>
+
+      <!-- Sign Up Form -->
+      <form id="signup-form">
+        <div class="auth-header">
+          <h2>Create Account</h2>
+          <p>Join us to access premium features</p>
+        </div>
+        <div class="form-group">
+          <label for="fullname">Full Name</label>
+          <div class="input-with-icon">
+            <i class="fas fa-user"></i>
+            <input type="text" id="fullname" placeholder="John Doe" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="signup-email">Email</label>
+          <div class="input-with-icon">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="signup-email" placeholder="name@company.com" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="signup-password">Password</label>
+          <div class="input-with-icon">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="signup-password" placeholder="Create a strong password" required>
+            <span class="password-toggle" id="signup-password-toggle"><i class="fas fa-eye"></i></span>
+          </div>
+          <div class="password-strength"><div class="strength-meter" id="strength-meter"></div></div>
+        </div>
+        <div class="form-group">
+          <label for="confirm-password">Confirm Password</label>
+          <div class="input-with-icon">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="confirm-password" placeholder="Confirm your password" required>
+          </div>
+        </div>
+        <div class="checkbox-group" style="margin-bottom: 20px;">
+          <input type="checkbox" id="terms" required>
+          <label for="terms">I agree to the Terms of Service and Privacy Policy</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Account</button>
+      </form>
+
+      <div class="auth-footer" id="signin-footer">
+        Don't have an account? <a href="#" id="signup-link">Sign up</a>
+      </div>
+      <div class="auth-footer" id="signup-footer" style="display: none;">
+        Already have an account? <a href="#" id="signin-link">Sign in</a>
+      </div>
+    </div>
+  </div>
+
+<script>
+  function toggleVisibility(toggleId, inputId) {
+    const toggle = document.getElementById(toggleId);
+    const input = document.getElementById(inputId);
+    toggle.addEventListener('click', () => {
+      const type = input.type === 'password' ? 'text' : 'password';
+      input.type = type;
+      toggle.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+    });
+  }
+
+  toggleVisibility('password-toggle', 'password');
+  toggleVisibility('signup-password-toggle', 'signup-password');
+
+  document.getElementById('signup-link').addEventListener('click', e => {
+    e.preventDefault();
+    document.getElementById('signin-form').style.display = 'none';
+    document.getElementById('signup-form').style.display = 'block';
+    document.getElementById('signin-footer').style.display = 'none';
+    document.getElementById('signup-footer').style.display = 'block';
+  });
+
+  document.getElementById('signin-link').addEventListener('click', e => {
+    e.preventDefault();
+    document.getElementById('signup-form').style.display = 'none';
+    document.getElementById('signin-form').style.display = 'block';
+    document.getElementById('signup-footer').style.display = 'none';
+    document.getElementById('signin-footer').style.display = 'block';
+  });
+
+  document.getElementById('signup-password').addEventListener('input', function () {
+    const val = this.value;
+    let score = 0;
+    if (val.length > 7) score += 25;
+    if (/[a-z]/.test(val)) score += 25;
+    if (/[A-Z]/.test(val)) score += 25;
+    if (/\d/.test(val)) score += 25;
+
+    const meter = document.getElementById('strength-meter');
+    meter.style.width = score + '%';
+    meter.style.background = score < 50 ? '#e74c3c' : score < 75 ? '#f39c12' : '#2ecc71';
+  });
+
+  document.getElementById('signin-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/signin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert("Login successful!");
+        localStorage.setItem("auth", data.token);
+        window.location.href = "/dashboard.html";
+      } else {
+        alert(data.message || "Login failed");
+      }
+    } catch (err) {
+      alert("Server error. Please try again later.");
+    }
+  });
+
+  document.getElementById('signup-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const name = document.getElementById('fullname').value;
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    const confirm = document.getElementById('confirm-password').value;
+
+    if (password !== confirm) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fullName: name, email, password })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert("Signup successful! Please login.");
+        document.getElementById('signup-form').reset();
+        document.getElementById('signup-form').style.display = 'none';
+        document.getElementById('signin-form').style.display = 'block';
+        document.getElementById('signup-footer').style.display = 'none';
+        document.getElementById('signin-footer').style.display = 'block';
+      } else {
+        alert(data.message || "Signup failed");
+      }
+    } catch (err) {
+      alert("Server error. Please try again later.");
+    }
+  });
+</script>
+</body>
+</html>
